@@ -3,7 +3,7 @@ name: Build and deploy ASP.Net Core app to an Azure Web App
 env: 
   AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '8'                 # set this to the .NET Core version to use
-
+  DOTNET_PROJECT: './src/Contoso.Api/Contoso.Api.csproj'
 on:
   push:
     branches: [ "main" ]
@@ -33,10 +33,10 @@ jobs:
             ${{ runner.os }}-nuget-
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ${{ env.DOTNET_PROJECT }} -c Release
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.RUNNER_TEMP}}/myapp
+        run: dotnet publish ${{ env.DOTNET_PROJECT }} -c Release -o ${{env.RUNNER_TEMP}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
