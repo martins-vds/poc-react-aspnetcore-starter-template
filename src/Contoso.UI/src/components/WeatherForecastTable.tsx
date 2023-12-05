@@ -1,3 +1,5 @@
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+
 interface Forecast {
   date: string;
   temperatureC: number;
@@ -6,30 +8,34 @@ interface Forecast {
 }
 
 interface WeatherForecastTableProps {
-  forecasts: Forecast[];
+  forecasts: Forecast[] | undefined;
 }
 
 export const WeatherForecastTable = ({ forecasts }: WeatherForecastTableProps) => {
   return (
-    <table className="table table-striped" aria-labelledby="tabelLabel">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Temp. (C)</th>
-          <th>Temp. (F)</th>
-          <th>Summary</th>
-        </tr>
-      </thead>
-      <tbody>
-        {forecasts.map((forecast) => (
-          <tr key={forecast.date}>
-            <td>{forecast.date}</td>
-            <td>{forecast.temperatureC}</td>
-            <td>{forecast.temperatureF}</td>
-            <td>{forecast.summary}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div>
+      <TableContainer className="table table-striped" aria-labelledby="tabelLabel">
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell component="th">Date</TableCell>
+              <TableCell component="th">Temp. (C)</TableCell>
+              <TableCell component="th">Temp. (F)</TableCell>
+              <TableCell component="th">Summary</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {forecasts && forecasts.map((forecast) => (
+              <TableRow key={forecast.date}>
+                <TableCell component="td">{forecast.date}</TableCell>
+                <TableCell component="td">{forecast.temperatureC}</TableCell>
+                <TableCell component="td">{forecast.temperatureF}</TableCell>
+                <TableCell component="td">{forecast.summary}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   );
 };

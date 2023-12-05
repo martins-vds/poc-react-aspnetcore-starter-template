@@ -1,9 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import { Home } from "./pages/Home";
-import { MsalProvider } from "@azure/msal-react";
-import { IPublicClientApplication } from "@azure/msal-browser";
+import { MsalAuthenticationTemplate, MsalProvider } from "@azure/msal-react";
+import { IPublicClientApplication, InteractionType } from "@azure/msal-browser";
 import { PageLayout } from "./components/PageLayout";
+import { WeatherForecast } from "./pages/WeatherForecast";
 
 interface AppProps {
   pca: IPublicClientApplication;
@@ -22,7 +23,14 @@ function App({ pca }: AppProps) {
 function Pages() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="*" element={
+        <MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/weather-forecast" element={<WeatherForecast />} />
+          </Routes>
+        </MsalAuthenticationTemplate>
+      } />
     </Routes>
   );
 }

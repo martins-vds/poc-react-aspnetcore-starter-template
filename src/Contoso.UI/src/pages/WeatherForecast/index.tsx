@@ -1,49 +1,23 @@
-import { MsalAuthenticationTemplate } from "@azure/msal-react";
-import { loginRequest, protectedResources } from "../../authConfig";
-import { InteractionType } from "@azure/msal-browser";
-import useFetchWithMsal from "../../hooks/useFetchWithMsal";
-import { useEffect, useState } from "react";
+import useFetchWithMsal, { HttpMethod } from "../../hooks/useFetchWithMsal";
+import { useEffect } from "react";
 import { WeatherForecastTable } from "../../components/WeatherForecastTable";
+import { protectedResources } from "../../authConfig";
 
-const WeatherForecastContent = () => {
-  const { error, execute } = useFetchWithMsal({
-    scopes: protectedResources.apiWeatherForecast.scopes.access_as_user,
-  });
+export const WeatherForecast = () => {
 
-  const [forecastData, setForecastData] = useState([]);
+  const { error, execute, data, isLoading } = useFetchWithMsal();
 
   useEffect(() => {
-    if (!forecastData) {
-      execute("GET", protectedResources.apiWeatherForecast.endpoint).then(
-        (response) => {
-          setForecastData(response);
-        }
-      );
-    }
-  }, [execute, forecastData]);
+    execute(HttpMethod.Get, protectedResources.apiWeatherForecast.endpoint, protectedResources.apiWeatherForecast.scopes.access_as_user);
+  }, [execute]);
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div>Failed to fetch data. Reason: {error.message}</div>;
   }
 
   return (
     <>
-      {forecastData ? <WeatherForecastTable forecasts={forecastData} /> : null}
+      {isLoading ? <div>Loading...</div> : <WeatherForecastTable forecasts={data} />}
     </>
-  );
-};
-
-export const WeatherForecast = () => {
-  const authRequest = {
-    ...loginRequest,
-  };
-
-  return (
-    <MsalAuthenticationTemplate
-      interactionType={InteractionType.Redirect}
-      authenticationRequest={authRequest}
-    >
-      <WeatherForecastContent />
-    </MsalAuthenticationTemplate>
   );
 };

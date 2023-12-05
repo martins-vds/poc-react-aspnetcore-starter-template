@@ -1,0 +1,44 @@
+name: 'Build and deploy ASP.Net Core app to Azure Web App'
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: 'webAppName'
+    value: 'your-web-app-name'
+  - name: 'resourceGroupName'
+    value: 'your-resource-group-name'
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore NuGet packages'
+    inputs:
+      command: 'restore'
+      projects: '**/*.csproj'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build the project'
+    inputs:
+      command: 'build'
+      projects: '**/*.csproj'
+      arguments: '--configuration Release'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish the project'
+    inputs:
+      command: 'publish'
+      projects: '**/*.csproj'
+      arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+
+  - task: AzureRmWebAppDeployment@4
+    displayName: 'Deploy to Azure Web App'
+    inputs:
+      ConnectionType: 'AzureRM'
+      azureSubscription: 'your-azure-subscription'
+      appType: 'webApp'
+      WebAppName: '$(webAppName)'
+      packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
+      enableCustomDeployment: true
+      ResourceGroupName: '$(resourceGroupName)'

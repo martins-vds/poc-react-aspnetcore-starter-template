@@ -1,11 +1,13 @@
+import { Container } from "@mui/material"
+import NavigationBar from "./NavigationBar"
+
 export const PageLayout = ({ children }: React.PropsWithChildren) => {
     return (
         <>
-            <div className="page">
-                <div className="page-content">
-                    {children}
-                </div>
-            </div>
+            <NavigationBar />
+            <Container maxWidth={"lg"}>
+                {children}
+            </Container>
         </>
     )
 }
