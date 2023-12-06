@@ -33,7 +33,7 @@ stages:
             env:
               VITE_B2C_DOMAIN: '__B2C_DOMAIN__'
               VITE_B2C_INSTANCE: '__B2C_INSTANCE__'
-              VITE_B2C_CLIENT_ID: '__B2C_CLIENT_ID__'
+              VITE_B2C_UI_CLIENT_ID: '__B2C_UI_CLIENT_ID__'
               VITE_B2C_SIGN_IN_POLICY: '__B2C_SIGN_IN_POLICY__'
               VITE_API_WEATHER_FORECAST_PATH: '__API_WEATHER_FORECAST_PATH__'
               VITE_API_WEATHER_FORECAST_SCOPE: '__API_WEATHER_FORECAST_SCOPE__'
@@ -60,7 +60,7 @@ stages:
               scriptType: 'bash'
               scriptLocation: 'scriptPath'
               scriptPath: './scripts/deploy-infra.sh'
-              arguments: '"$(location)" "$(rgName)" "$(deploymentTemplate)" "$(app)" "$(environment)" "$(b2cInstance)" "$(b2cClientId)" "$(b2cDomain)" "$(b2cSigninPolicyName)" "$(b2cSignoutCallbackPath)"'
+              arguments: '"$(location)" "$(rgName)" "$(deploymentTemplate)" "$(app)" "$(environment)" "$(b2cInstance)" "$(b2cApiClientId)" "$(b2cDomain)" "$(b2cSigninPolicyName)" "$(b2cSignoutCallbackPath)"'
       - job: app
         dependsOn: infra
         displayName: 'Deploy App'
@@ -75,12 +75,13 @@ stages:
 
           - script: |
               unzip -o $(Pipeline.Workspace)/dist/app.linux-x64.zip -d $(Pipeline.Workspace)/dist/app
+              rm -f $(Pipeline.Workspace)/dist/app.linux-x64.zip
             displayName: "Unzip dist binaries"
 
           - bash: |
               ./scripts/replace-env.sh "__B2C_DOMAIN__" "$(b2cDomain)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__B2C_INSTANCE__" "$(b2cInstance)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
-              ./scripts/replace-env.sh "__B2C_CLIENT_ID__" "$(b2cClientId)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__B2C_UI_CLIENT_ID__" "$(b2cUiClientId)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__B2C_SIGN_IN_POLICY__" "$(b2cSigninPolicyName)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__API_WEATHER_FORECAST_ENDPOINT__" "https://$(appEndpoint)/$(apiWeatherForecastPath)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__API_WEATHER_FORECAST_SCOPE__" "$(apiWeatherForecastScope)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
@@ -92,6 +93,10 @@ stages:
               rm -rf $(Pipeline.Workspace)/dist/app
             displayName: "Zip dist binaries"
 
+          - publish: "./dist"
+            displayName: "Publish artifacts"
+            artifact: dist-dev
+          
           - task: AzureCLI@2
             displayName: "Deploy App"
             inputs:

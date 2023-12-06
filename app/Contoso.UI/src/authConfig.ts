@@ -18,7 +18,7 @@ import {
 const b2cConfig = {
   domain: import.meta.env.VITE_B2C_DOMAIN,
   instance: import.meta.env.VITE_B2C_INSTANCE,
-  clientId: import.meta.env.VITE_B2C_CLIENT_ID,
+  clientId: import.meta.env.VITE_B2C_UI_CLIENT_ID,
   signInPolicy: import.meta.env.VITE_B2C_SIGN_IN_POLICY,
 };
 
