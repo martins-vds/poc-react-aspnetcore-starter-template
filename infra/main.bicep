@@ -108,23 +108,23 @@ resource app_service_web 'Microsoft.Web/sites@2021-02-01' = {
           value: app_insights.properties.ConnectionString
         }
         {
-          name: 'AzureB2C:Instance'
+          name: 'AzureB2C__Instance'
           value: b2c_instance
         }
         {
-          name: 'AzureB2C:ClientId'
+          name: 'AzureB2C__ClientId'
           value: b2c_clientId
         }
         {
-          name: 'AzureB2C:Domain'
+          name: 'AzureB2C__Domain'
           value: b2c_domain
         }
         {
-          name: 'AzureB2C:SignUpSignInPolicyId'
+          name: 'AzureB2C__SignUpSignInPolicyId'
           value: b2c_signinPolicyName
         }
         {
-          name: 'AzureB2C:SignedOutCallbackPath'
+          name: 'AzureB2C__SignedOutCallbackPath'
           value: b2c_signoutCallbackPath
         }
       ]
