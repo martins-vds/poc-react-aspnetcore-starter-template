@@ -93,7 +93,7 @@ stages:
               rm -rf $(Pipeline.Workspace)/dist/app
             displayName: "Zip dist binaries"
 
-          - publish: "./dist"
+          - publish: "$(Pipeline.Workspace)/dist"
             displayName: "Publish artifacts"
             artifact: dist-dev
           
