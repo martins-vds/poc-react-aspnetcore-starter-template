@@ -86,10 +86,12 @@ stages:
               ./scripts/replace-env.sh "__API_WEATHER_FORECAST_ENDPOINT__" "https://$(appEndpoint)/$(apiWeatherForecastPath)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__API_WEATHER_FORECAST_SCOPE__" "$(apiWeatherForecastScope)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
             displayName: "Replace placeholders with env variables"
-            name: replace_env
+            name: replace_env          
 
           - script: |
-              zip -r -q -9 "$(Pipeline.Workspace)/dist/app.linux-x64.zip" "$(Pipeline.Workspace)/dist/app"
+              pushd $(Pipeline.Workspace)/dist/app
+              zip -r -q -9 "../../app.linux-x64.zip" .
+              popd
               rm -rf $(Pipeline.Workspace)/dist/app
             displayName: "Zip dist binaries"
 
