@@ -63,7 +63,7 @@ export const msalConfig: Configuration = {
 export const protectedResources = {
   apiWeatherForecast: {
     endpoint:
-      import.meta.env.VITE_API_WEATHER_FORECAST_ENDPOINT ??
+      import.meta.env.VITE_API_WEATHER_FORECAST_PATH ??
       "https://localhost:7014/WeatherForecast",
     scopes: {
       access_as_user: [
