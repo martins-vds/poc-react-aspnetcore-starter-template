@@ -35,7 +35,7 @@ stages:
               VITE_B2C_INSTANCE: '__B2C_INSTANCE__'
               VITE_B2C_CLIENT_ID: '__B2C_CLIENT_ID__'
               VITE_B2C_SIGN_IN_POLICY: '__B2C_SIGN_IN_POLICY__'
-              VITE_API_WEATHER_FORECAST_ENDPOINT: '__API_WEATHER_FORECAST_ENDPOINT__'
+              VITE_API_WEATHER_FORECAST_PATH: '__API_WEATHER_FORECAST_PATH__'
               VITE_API_WEATHER_FORECAST_SCOPE: '__API_WEATHER_FORECAST_SCOPE__'
             displayName: "Publish App"
 
@@ -78,12 +78,12 @@ stages:
             displayName: "Unzip dist binaries"
 
           - script: |
-              replace-env.sh "__B2C_DOMAIN__" "$(b2cDomain)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
-              replace-env.sh "__B2C_INSTANCE__" "$(b2cInstance)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
-              replace-env.sh "__B2C_CLIENT_ID__" "$(b2cClientId)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
-              replace-env.sh "__B2C_SIGN_IN_POLICY__" "$(b2cSigninPolicyName)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
-              replace-env.sh "__API_WEATHER_FORECAST_ENDPOINT__" "$(appEndpoint)/$(apiWeatherForecastEndpoint)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
-              replace-env.sh "__API_WEATHER_FORECAST_SCOPE__" "$(apiWeatherForecastScope)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__B2C_DOMAIN__" "$(b2cDomain)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__B2C_INSTANCE__" "$(b2cInstance)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__B2C_CLIENT_ID__" "$(b2cClientId)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__B2C_SIGN_IN_POLICY__" "$(b2cSigninPolicyName)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__API_WEATHER_FORECAST_ENDPOINT__" "$(appEndpoint)/$(apiWeatherForecastPath)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__API_WEATHER_FORECAST_SCOPE__" "$(apiWeatherForecastScope)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
             displayName: "Replace placeholders with env variables"
             name: replace_env
 
