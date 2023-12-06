@@ -56,7 +56,7 @@ stages:
             displayName: 'Deploy Infra'
             name: deploy_infra
             inputs:
-              azureSubscription: $(serviceConnectionName)
+              azureSubscription: 'sc-contoso-dev'
               scriptType: 'bash'
               scriptLocation: 'scriptPath'
               scriptPath: './scripts/deploy-infra.sh'
@@ -94,7 +94,7 @@ stages:
           - task: AzureCLI@2
             displayName: "Deploy App"
             inputs:
-              azureSubscription: $(serviceConnectionName)
+              azureSubscription: 'sc-contoso-dev'
               scriptType: 'bash'
               scriptLocation: 'scriptPath'
               scriptPath: './scripts/deploy-app.sh'
