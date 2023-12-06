@@ -77,7 +77,7 @@ stages:
               unzip -o $(Pipeline.Workspace)/dist/app.linux-x64.zip -d $(Pipeline.Workspace)/dist/app
             displayName: "Unzip dist binaries"
 
-          - script: |
+          - bash: |
               ./scripts/replace-env.sh "__B2C_DOMAIN__" "$(b2cDomain)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__B2C_INSTANCE__" "$(b2cInstance)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__B2C_CLIENT_ID__" "$(b2cClientId)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
