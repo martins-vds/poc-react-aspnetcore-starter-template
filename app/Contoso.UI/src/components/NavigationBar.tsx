@@ -8,11 +8,16 @@ import { LoginButton } from './LoginButton';
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-react';
 import { LogoutButton } from './LogoutButton';
 import {
-    Link as RouterLink
+    useNavigate
 } from 'react-router-dom';
 import { Button } from '@mui/material';
 
 export default function NavigationBar() {
+    const navigate = useNavigate();
+
+    const handleMenuClick = (location: string) => {
+        navigate(location);
+    }
 
     return (
         <Box sx={{ flexGrow: 1 }}>
@@ -30,11 +35,11 @@ export default function NavigationBar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         React AspNetCore Starter Template
                     </Typography>
-                    <AuthenticatedTemplate>                                                                      
-                        <Button LinkComponent={RouterLink} color='inherit' sx={{ ml: 2 }} to='/weather-forecast'>Weather Forecast</Button>
+                    <AuthenticatedTemplate>
+                        <Button sx={{ ml: 2 }} onClick={() => handleMenuClick('/weather-forecast')}>Weather Forecast</Button>
                         <LogoutButton />
                     </AuthenticatedTemplate>
-                    <UnauthenticatedTemplate>                        
+                    <UnauthenticatedTemplate>
                         <LoginButton />
                     </UnauthenticatedTemplate>
                 </Toolbar>

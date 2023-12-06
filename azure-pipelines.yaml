@@ -1,44 +1,101 @@
-name: 'Build and deploy ASP.Net Core app to Azure Web App'
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - app
+      - azure-pipelines.yml
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
 variables:
-  - name: 'webAppName'
-    value: 'your-web-app-name'
-  - name: 'resourceGroupName'
-    value: 'your-resource-group-name'
+  - name: deploymentTemplate
+    value: './infra/main.bicep'
+  - name: app
+    value: 'contoso'
+  
+stages:
+  - stage: build
+    displayName: Build App
+    jobs:
+      - job: app
+        displayName: 'Build App'
+        steps:
+          - bash: "./scripts/publish-app.sh"
+            env:
+              VITE_B2C_DOMAIN: '__B2C_DOMAIN__'
+              VITE_B2C_INSTANCE: '__B2C_INSTANCE__'
+              VITE_B2C_CLIENT_ID: '__B2C_CLIENT_ID__'
+              VITE_B2C_SIGN_IN_POLICY: '__B2C_SIGN_IN_POLICY__'
+              VITE_API_WEATHER_FORECAST_ENDPOINT: '__API_WEATHER_FORECAST_ENDPOINT__'
+              VITE_API_WEATHER_FORECAST_SCOPE: '__API_WEATHER_FORECAST_SCOPE__'
+            displayName: "Publish App"
 
-steps:
-  - task: DotNetCoreCLI@2
-    displayName: 'Restore NuGet packages'
-    inputs:
-      command: 'restore'
-      projects: '**/*.csproj'
+          - publish: "./dist"
+            displayName: "Publish artifacts"
+            artifact: dist
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Build the project'
-    inputs:
-      command: 'build'
-      projects: '**/*.csproj'
-      arguments: '--configuration Release'
+  - stage: deploy_dev
+    dependsOn: build
+    displayName: Deploy Dev
+    variables:
+      - group: 'contoso_dev' 
+    jobs:
+      - job: infra
+        displayName: "Deploy Infrastructure"                 
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Deploy Infra'
+            name: deploy_infra
+            inputs:
+              azureSubscription: '$(serviceConnectionName)'
+              scriptType: 'bash'
+              scriptLocation: 'scriptPath'
+              scriptPath: './scripts/deploy-infra.sh'
+              arguments: '"$(location)" "$(rgName)" "$(deploymentTemplate)" "$(app)" "$(environment)" "$(b2cInstance)" "$(b2cClientId)" "$(b2cDomain)" "$(b2cSigninPolicyName)" "$(b2cSignoutCallbackPath)"'
+      - job: app
+        dependsOn: infra
+        displayName: 'Deploy App'
+        variables:
+          appName: $[dependencies.infra.outputs['deploy_infra.app_service_name']]
+        steps:
+          - download: current
+            artifact: dist
+            displayName: "Download dist binaries"
+            patterns: '**/*.zip'
 
-  - task: DotNetCoreCLI@2
-    displayName: 'Publish the project'
-    inputs:
-      command: 'publish'
-      projects: '**/*.csproj'
-      arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+          - script: |
+              unzip -o $(Pipeline.Workspace)/dist/app.linux-x64.zip -d $(Pipeline.Workspace)/dist/app
+            displayName: "Unzip dist binaries"
 
-  - task: AzureRmWebAppDeployment@4
-    displayName: 'Deploy to Azure Web App'
-    inputs:
-      ConnectionType: 'AzureRM'
-      azureSubscription: 'your-azure-subscription'
-      appType: 'webApp'
-      WebAppName: '$(webAppName)'
-      packageForLinux: '$(Build.ArtifactStagingDirectory)/**/*.zip'
-      enableCustomDeployment: true
-      ResourceGroupName: '$(resourceGroupName)'
+          - script: |
+              replace-env.sh "__B2C_DOMAIN__" "$(b2cDomain)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              replace-env.sh "__B2C_INSTANCE__" "$(b2cInstance)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              replace-env.sh "__B2C_CLIENT_ID__" "$(b2cClientId)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              replace-env.sh "__B2C_SIGN_IN_POLICY__" "$(b2cSigninPolicyName)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              replace-env.sh "__API_WEATHER_FORECAST_ENDPOINT__" "$(apiWeatherForecastEndpoint)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              replace-env.sh "__API_WEATHER_FORECAST_SCOPE__" "$(apiWeatherForecastScope)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+            displayName: "Replace placeholders with env variables"
+            name: replace_env
+
+          - script: |
+              zip -r -q -9 "$(Pipeline.Workspace)/dist/app.linux-x64.zip" "$(Pipeline.Workspace)/dist/app"
+              rm -rf $(Pipeline.Workspace)/dist/app
+            displayName: "Zip dist binaries"
+
+          - task: AzureCLI@2
+            displayName: "Deploy App"
+            inputs:
+              azureSubscription: '$(serviceConnectionName)'
+              scriptType: 'bash'
+              scriptLocation: 'scriptPath'
+              scriptPath: './scripts/deploy-app.sh'
+              arguments: '"$(rgName)" "$(appName)" "$(Pipeline.Workspace)/dist/app.linux-x64.zip"'

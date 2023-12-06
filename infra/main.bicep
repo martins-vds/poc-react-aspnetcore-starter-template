@@ -1,23 +1,20 @@
-type b2cConfigType = {
-  instance: string
-  clientId: string
-  domain: string
-  signinPolicyName: string
-  signoutCallbackPath: string
-}
-
 param app string
-param env string
+param environment string
+param  b2c_instance string
+param  b2c_clientId string
+param  b2c_domain string
+param  b2c_signinPolicyName string
+param  b2c_signoutCallbackPath string
+
 param location string = resourceGroup().location
-param b2cConfig b2cConfigType
 
 param tags object = {
-  environment: env
+  environment: environment
   region: location
   app: app
 }
-
-var appName = '${app}-${env}'
+var random_string = substring(uniqueString(resourceGroup().id), 0, 4)
+var appName = '${app}-${environment}-${random_string}'
 var app_insights_name = '${appName}-ai'
 var app_service_plan_name = '${appName}-asp'
 var app_service_web_name = '${appName}-web'
@@ -112,23 +109,23 @@ resource app_service_web 'Microsoft.Web/sites@2021-02-01' = {
         }
         {
           name: 'AzureB2C:Instance'
-          value: b2cConfig.instance
+          value: b2c_instance
         }
         {
           name: 'AzureB2C:ClientId'
-          value: b2cConfig.clientId
+          value: b2c_clientId
         }
         {
           name: 'AzureB2C:Domain'
-          value: b2cConfig.domain
+          value: b2c_domain
         }
         {
           name: 'AzureB2C:SignUpSignInPolicyId'
-          value: b2cConfig.signinPolicyName
+          value: b2c_signinPolicyName
         }
         {
           name: 'AzureB2C:SignedOutCallbackPath'
-          value: b2cConfig.signoutCallbackPath
+          value: b2c_signoutCallbackPath
         }
       ]
     }
@@ -146,4 +143,5 @@ resource app_service_web 'Microsoft.Web/sites@2021-02-01' = {
   }
 }
 
-output appServiceEndpoint string = app_service_web.properties.defaultHostName
+output app_service_name string = app_service_web.name
+output app_service_endpoint string = app_service_web.properties.defaultHostName
