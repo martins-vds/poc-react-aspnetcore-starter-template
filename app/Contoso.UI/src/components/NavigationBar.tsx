@@ -35,6 +35,7 @@ export default function NavigationBar() {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         React AspNetCore Starter Template
                     </Typography>
+                    <Button color='inherit' sx={{ ml: 2 }} onClick={() => handleMenuClick('/')}>Home</Button>
                     <AuthenticatedTemplate>
                         <Button color='inherit' sx={{ ml: 2 }} onClick={() => handleMenuClick('/weather-forecast')}>Weather Forecast</Button>
                         <LogoutButton />
