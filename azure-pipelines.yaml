@@ -89,7 +89,9 @@ stages:
             name: replace_env          
 
           - script: |
-              zip -r -q -9 $(Pipeline.Workspace)/dist/app.linux-x64.zip $(Pipeline.Workspace)/dist/app/*
+              pushd $(Pipeline.Workspace)/dist/app
+              zip -r -q -9 "$(Pipeline.Workspace)/dist/app.linux-x64.zip" *
+              popd
               rm -rf $(Pipeline.Workspace)/dist/app
             displayName: "Zip dist binaries"
 
