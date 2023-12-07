@@ -83,7 +83,7 @@ stages:
               ./scripts/replace-env.sh "__B2C_INSTANCE__" "$(b2cInstance)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__B2C_UI_CLIENT_ID__" "$(b2cUiClientId)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__B2C_SIGN_IN_POLICY__" "$(b2cSigninPolicyName)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
-              ./scripts/replace-env.sh "__API_WEATHER_FORECAST_ENDPOINT__" "https://$(appEndpoint)/$(apiWeatherForecastPath)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
+              ./scripts/replace-env.sh "__API_WEATHER_FORECAST_PATH__" "https://$(appEndpoint)/$(apiWeatherForecastPath)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
               ./scripts/replace-env.sh "__API_WEATHER_FORECAST_SCOPE__" "$(apiWeatherForecastScope)" "$(Pipeline.Workspace)/dist/app/wwwroot/"
             displayName: "Replace placeholders with env variables"
             name: replace_env          
