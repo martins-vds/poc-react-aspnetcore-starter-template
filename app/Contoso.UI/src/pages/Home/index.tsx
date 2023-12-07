@@ -25,8 +25,10 @@ export const Home = () => {
                     username = activeAccount.idTokenClaims["preferred_username"];
                 } else if (activeAccount.idTokenClaims["email"]) {
                     username = activeAccount.idTokenClaims["email"] as string; 
+                } else if (activeAccount.idTokenClaims["given_name"]) {
+                    username = activeAccount.idTokenClaims["given_name"] as string; 
                 }
-
+                
                 setWelcomeMsg(`Welcome ${username}!`);
             }
         }
